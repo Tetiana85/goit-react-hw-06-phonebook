@@ -1,6 +1,17 @@
 import { FilterInput } from './Filter.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectFilter } from '../../redux/selectors';
+import { setFilter } from '../../redux/contactSlice';
 
-const Filter = ({ filter, onUpdateFilter }) => {
+const Filter = () => {
+  const dispatch = useDispatch();
+  const filter = useSelector(selectFilter);
+
+  const handleUpdateFilter = evt => {
+    const value = evt.target.value;
+    dispatch(setFilter(value));
+  };
+
   return (
     <>
       <p>Find contacts by name</p>
@@ -8,7 +19,7 @@ const Filter = ({ filter, onUpdateFilter }) => {
         type="text"
         name="filter"
         value={filter}
-        onChange={onUpdateFilter}
+        onChange={handleUpdateFilter}
         required
       />
     </>

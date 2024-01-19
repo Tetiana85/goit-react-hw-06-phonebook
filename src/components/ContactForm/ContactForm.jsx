@@ -7,6 +7,10 @@ import {
   ErrorMessage,
 } from './ContactForm.styled';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactSlice';
+import { nanoid } from 'nanoid';
+import { selectContacts } from '../../redux/selectors';
 
 const contactSchema = Yup.object().shape({
   name: Yup.string()
@@ -20,19 +24,31 @@ const contactSchema = Yup.object().shape({
     .required('Required'),
 });
 
-const ContactForm = ({ updateContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
+  const handleAddContact = (values, actions) => {
+    const checkContact = contacts.find(
+      contact => contact.name.toLowerCase() === values.name.toLowerCase()
+    );
+
+    if (checkContact) {
+      alert(`${values.name} is already in contacts.`);
+      return;
+    }
+
+    const newContact = { ...values, id: nanoid() };
+    dispatch(addContact(newContact));
+    actions.resetForm();
+  };
+
   return (
     <div>
       <Formik
-        initialValues={{
-          name: '',
-          number: '',
-        }}
+        initialValues={{ name: '', number: '' }}
         validationSchema={contactSchema}
-        onSubmit={(values, actions) => {
-          updateContact(values);
-          actions.resetForm();
-        }}
+        onSubmit={(values, actions) => handleAddContact(values, actions)}
       >
         <Form>
           <StyledLabel htmlFor="name">
